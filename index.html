@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AquaControl - Acesso Seguro</title>
+    
+    <!-- TAGS PWA PARA O GITHUB -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0275d8">
+    <link rel="apple-touch-icon" href="icone-512x512.png">
+
+    <style>
+        /* MANTENHA AQUI TODO O SEU CSS ORIGINAL DA V15.2 (Tudo que fica entre <style> e </style> no seu código antigo) */
+        
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f4f8; margin: 0; padding: 10px; color: #333; }
+        .container { max-width: 650px; margin: 0 auto; }
+        
+        /* Design específico para esta tela de Login */
+        .tela-login { max-width: 400px; margin: 50px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; border: 1px solid #bce8f1; }
+        .tela-login h1 { color: #0275d8; margin-top: 0; margin-bottom: 20px; font-size: 1.5rem; }
+        .tela-login label { font-size: 0.8rem; font-weight: 700; display: block; margin-bottom: 4px; color: #495057; text-align: left; }
+        .tela-login input { width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 6px; box-sizing: border-box; font-size: 1rem; margin-bottom: 15px; }
+        .tela-login button { width: 100%; background-color: #0275d8; color: white; border: none; padding: 12px; font-weight: bold; border-radius: 6px; cursor: pointer; font-size: 1rem; }
+        .loader { display: none; margin-top: 15px; font-size: 0.9rem; color: #0275d8; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<!-- O CONTEÚDO TODO DO APLICATIVO SERÁ INJETADO DENTRO DESTA DIV -->
+<div class="container" id="app-container">
+    
+    <!-- TELA DE LOGIN (CASCA VAZIA) -->
+    <div class="tela-login" id="tela-login-ui">
+        <h1>🔒 AquaControl Acesso</h1>
+        <p style="font-size: 0.85rem; color: #666; margin-bottom: 20px;">Autenticação obrigatória para carregar os módulos térmicos.</p>
+        
+        <div>
+            <label>Seu Nome</label>
+            <input type="text" id="login_nome" placeholder="Ex: Anderson">
+        </div>
+        <div>
+            <label>Senha da Nuvem</label>
+            <input type="password" id="login_senha" placeholder="Digite a senha">
+        </div>
+        
+        <button id="btn-login" onclick="fazerLogin()">Baixar e Iniciar Aplicativo</button>
+        <div class="loader" id="login-loader">⏳ Conectando aos servidores...<br>baixando módulos térmicos...</div>
+    </div>
+
+</div>
+
+<script>
+    // AQUI VOCÊ COLA O LINK QUE O GOOGLE GERAR DEPOIS DE IMPLANTAR!
+    const GOOGLE_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzBzvOtp4nlC9jsbBs_cPpoKTnzDLYAyVcfKGiDk0E3D4A_VOAssr0HYa5J_VhZNIAJyA/exec";
+
+    // Puxa os dados salvos para facilitar a vida da equipe
+    window.onload = () => {
+        if(localStorage.getItem('aqua_nome')) document.getElementById('login_nome').value = localStorage.getItem('aqua_nome');
+        if(localStorage.getItem('aqua_senha')) document.getElementById('login_senha').value = localStorage.getItem('aqua_senha');
+    };
+
+    // FUNÇÃO QUE PEDE O APLICATIVO PARA O GOOGLE
+    async function fazerLogin() {
+        const nome = document.getElementById('login_nome').value.trim();
+        const senha = document.getElementById('login_senha').value.trim();
+
+        if (!nome || !senha) { alert("Preencha nome e senha!"); return; }
+
+        document.getElementById('btn-login').style.display = 'none';
+        document.getElementById('login-loader').style.display = 'block';
+
+        try {
+            const resposta = await fetch(GOOGLE_WEB_APP_URL, {
+                method: 'POST',
+                body: JSON.stringify({ tipo: 'LOGIN', senha: senha })
+            });
+            const dados = await resposta.json();
+
+            if (dados.status === "success") {
+                // Senha correta: Salva no celular para a próxima vez
+                localStorage.setItem('aqua_nome', nome);
+                localStorage.setItem('aqua_senha', senha);
+                
+                // Injeta o HTML Visual na Tela (Os botões e menus que vieram do Google)
+                document.getElementById('app-container').innerHTML = dados.html;
+
+                // Cria um script invisível e injeta a matemática nele
+                const scriptApp = document.createElement('script');
+                scriptApp.textContent = dados.js;
+                document.body.appendChild(scriptApp);
+
+            } else {
+                alert("❌ " + dados.message);
+                document.getElementById('btn-login').style.display = 'block';
+                document.getElementById('login-loader').style.display = 'none';
+            }
+        } catch (erro) {
+            alert("❌ Erro de rede. É necessário internet para fazer o login inicial.");
+            document.getElementById('btn-login').style.display = 'block';
+            document.getElementById('login-loader').style.display = 'none';
+        }
+    }
+
+    // REGISTRO DO SERVICE WORKER (Para o PWA funcionar e o Login abrir offline)
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js')
+            .catch((erro) => console.log('Falha ao registrar Service Worker:', erro));
+    }
+</script>
+
+</body>
+</html>

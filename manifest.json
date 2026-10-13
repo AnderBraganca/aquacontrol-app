@@ -1,0 +1,16 @@
+{
+  "name": "AquaControl",
+  "short_name": "AquaControl",
+  "description": "Controle de Aquário e Cálculos Térmicos",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#f0f4f8",
+  "theme_color": "#0275d8",
+  "icons": [
+    {
+      "src": "icone-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

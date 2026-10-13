@@ -83,21 +83,29 @@
             });
             const dados = await resposta.json();
 
-          if (dados.status === "success") {
+         if (dados.status === "success") {
                 localStorage.setItem('aqua_nome', nome);
                 localStorage.setItem('aqua_senha', senha);
                 document.getElementById('app-container').innerHTML = dados.html;
                 
-                // Limpeza e execução seguras
-                let codigoLimpo = dados.js.replace(/<script[^>]*>/gi, '').replace(/<\/script>/gi, '');
-                
-                // Injeta o código executando-o diretamente no escopo global usando new Function
+                // Vamos inspecionar exatamente o que vem do Google
+                console.log("CÓDIGO RECEBIDO:", dados.js);
+
+                // Forçar limpeza brutal de qualquer tag HTML remanescente
+                let codigoBruto = dados.js || "";
+                let codigoLimpo = codigoBruto.replace(/<[^>]*>?/gm, '');
+
+                console.log("CÓDIGO LIMPO:", codigoLimpo);
+
                 try {
-                    const executarApp = new Function(codigoLimpo);
-                    executarApp();
+                    // O setTimeout força o script a rodar apenas após o HTML estar desenhado
+                    setTimeout(function() {
+                         window.eval(codigoLimpo);
+                         console.log("Scripts executados com sucesso!");
+                    }, 500);
                 } catch (erroScript) {
-                    console.error("Erro ao injetar lógica da nuvem: ", erroScript);
-                    alert("Aviso: O visual carregou, mas a lógica encontrou um erro.");
+                    console.error("Erro fatal ao avaliar a lógica:", erroScript);
+                    alert("Erro interno na Lógica do Google. Abra o Console (F12) para detalhes.");
                 }
 
             } else {

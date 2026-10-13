@@ -83,19 +83,23 @@
             });
             const dados = await resposta.json();
 
-           if (dados.status === "success") {
+          if (dados.status === "success") {
                 localStorage.setItem('aqua_nome', nome);
                 localStorage.setItem('aqua_senha', senha);
                 document.getElementById('app-container').innerHTML = dados.html;
                 
-                // FILTRO: Remove as tags HTML do meio do JavaScript recebido do Google
-                let codigoLimpo = dados.js;
-                codigoLimpo = codigoLimpo.replace(/<script[^>]*>/gi, '');
-                codigoLimpo = codigoLimpo.replace(/<\/script>/gi, '');
+                // Limpeza e execução seguras
+                let codigoLimpo = dados.js.replace(/<script[^>]*>/gi, '').replace(/<\/script>/gi, '');
                 
-                const scriptApp = document.createElement('script');
-                scriptApp.textContent = codigoLimpo;
-                document.body.appendChild(scriptApp);
+                // Injeta o código executando-o diretamente no escopo global usando new Function
+                try {
+                    const executarApp = new Function(codigoLimpo);
+                    executarApp();
+                } catch (erroScript) {
+                    console.error("Erro ao injetar lógica da nuvem: ", erroScript);
+                    alert("Aviso: O visual carregou, mas a lógica encontrou um erro.");
+                }
+
             } else {
                 alert("❌ " + dados.message);
                 document.getElementById('btn-login').style.display = 'block';

@@ -88,24 +88,21 @@
                 localStorage.setItem('aqua_senha', senha);
                 document.getElementById('app-container').innerHTML = dados.html;
                 
-                // Vamos inspecionar exatamente o que vem do Google
-                console.log("CÓDIGO RECEBIDO:", dados.js);
+                // 1. Truque mágico: Força o navegador a traduzir &lt; e &gt; de volta para < e >
+                const tradutor = document.createElement('textarea');
+                tradutor.innerHTML = dados.js || "";
+                let jsReal = tradutor.value;
 
-                // Forçar limpeza brutal de qualquer tag HTML remanescente
-                let codigoBruto = dados.js || "";
-                let codigoLimpo = codigoBruto.replace(/<[^>]*>?/gm, '');
+                // 2. Limpeza de segurança (caso o Google mande tags <script> misturadas)
+                jsReal = jsReal.replace(/<script[^>]*>/gi, '').replace(/<\/script>/gi, '');
 
-                console.log("CÓDIGO LIMPO:", codigoLimpo);
-
+                // 3. Executa a lógica agora que a matemática está perfeita
                 try {
-                    // O setTimeout força o script a rodar apenas após o HTML estar desenhado
-                    setTimeout(function() {
-                         window.eval(codigoLimpo);
-                         console.log("Scripts executados com sucesso!");
-                    }, 500);
+                    window.eval(jsReal);
+                    console.log("Lógica matemática injetada com sucesso!");
                 } catch (erroScript) {
-                    console.error("Erro fatal ao avaliar a lógica:", erroScript);
-                    alert("Erro interno na Lógica do Google. Abra o Console (F12) para detalhes.");
+                    console.error("Erro na lógica:", erroScript);
+                    alert("Aviso: Falha ao carregar funções.");
                 }
 
             } else {

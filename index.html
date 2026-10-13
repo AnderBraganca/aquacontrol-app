@@ -87,8 +87,12 @@
                 localStorage.setItem('aqua_nome', nome);
                 localStorage.setItem('aqua_senha', senha);
                 document.getElementById('app-container').innerHTML = dados.html;
+                
+                // NOVIDADE: Filtro para limpar as tags que vêm do Google e impedir o travamento
+                const codigoLimpo = dados.js.replace(/<script>/gi, '').replace(/<\/script>/gi, '');
+                
                 const scriptApp = document.createElement('script');
-                scriptApp.textContent = dados.js;
+                scriptApp.textContent = codigoLimpo;
                 document.body.appendChild(scriptApp);
             } else {
                 alert("❌ " + dados.message);

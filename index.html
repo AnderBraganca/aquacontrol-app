@@ -1,178 +1,185 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AquaControl - Acesso Seguro</title>
-    
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0275d8">
-    <link rel="apple-touch-icon" href="icone-512x512.png">
-    <style>
-        :root {
-            --primary: #0275d8;
-            --primary-hover: #0157a0;
-            --success: #28a745;
-            --success-hover: #218838;
-            --danger: #d9534f;
-            --danger-hover: #c9302c;
-            --bg-color: #f0f4f8;
-            --card-bg: #ffffff;
-            --text-color: #333333;
-            --border-color: #ced4da;
-        }
-
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); margin: 0; padding: 10px; color: var(--text-color); }
-        .container { max-width: 650px; margin: 0 auto; }
-        
-        .card { background: var(--card-bg); padding: 15px; margin-bottom: 15px; border-radius: 12px; border: 1px solid #bce8f1; box-shadow: 0 4px 8px rgba(2, 117, 216, 0.08); }
-        
-        .header-app { display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, #0275d8, #0157a0); color: white; padding: 15px 20px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(2, 117, 216, 0.3); }
-        .header-app h1 { margin: 0; font-size: 1.4rem; }
-        .badge-nuvem { background: rgba(255, 255, 255, 0.2); padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; display: flex; align-items: center; gap: 5px; }
-        h2 { margin-top: 0; color: var(--primary); font-size: 1.1rem; border-bottom: 2px solid #e9ecef; padding-bottom: 8px; margin-bottom: 12px; }
-        
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
-        .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px; margin-bottom: 10px; }
-        @media (max-width: 500px) { .grid-4 { grid-template-columns: 1fr 1fr; } }
-
-        label { font-size: 0.8rem; font-weight: 700; display: block; margin-bottom: 4px; color: #495057; }
-        input, select, textarea { width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; box-sizing: border-box; font-size: 0.9rem; background-color: #fff; }
-        input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(2, 117, 216, 0.15); }
-        
-        .input-readonly { background-color: #e9ecef !important; color: #495057; border: 1px solid #ced4da; text-align: center; font-size: 0.85rem; padding: 6px; }
-
-        button { width: 100%; background-color: var(--primary); color: white; border: none; padding: 12px; font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 10px; font-size: 0.95rem; transition: background 0.2s; }
-        button:hover { background-color: var(--primary-hover); }
-        .btn-success { background-color: var(--success); }
-        .btn-success:hover { background-color: var(--success-hover); }
-        .btn-blue { background-color: #0275d8; }
-        .btn-blue:hover { background-color: #0157a0; }
-
-        .secao-app { display: none; }
-        .menu-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 10px; }
-        .btn-menu { background: #fff; color: var(--primary); border: 2px solid #bce8f1; padding: 18px; border-radius: 10px; font-size: 1.1rem; font-weight: bold; cursor: pointer; text-align: left; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(2, 117, 216, 0.05); transition: all 0.2s; margin-top: 0; }
-        .btn-menu:hover { background: #e7f3ff; border-color: var(--primary); transform: translateY(-2px); }
-        .btn-menu-icon { font-size: 1.3rem; color: #0275d8; }
-        
-        .btn-voltar { background-color: #6c757d; margin-bottom: 15px; margin-top: 0; display: flex; justify-content: center; align-items: center; gap: 8px; }
-        .btn-voltar:hover { background-color: #5a6268; }
-
-        .resultado { background: #e7f3ff; border: 1px solid #bce8f1; color: #0c5460; padding: 12px; border-radius: 6px; font-weight: normal; margin-top: 12px; text-align: center; font-size: 1rem; line-height: 1.4; }
-        .info-tpa-inline { font-size: 0.85rem; color: #0275d8; font-weight: bold; display: flex; align-items: flex-end; padding-bottom: 4px; }
-        
-        .info-dosagem-guard { background: #e7f3ff; border: 1px solid #bce8f1; color: #0c5460; padding: 12px; border-radius: 6px; font-weight: bold; margin-top: 12px; margin-bottom: 10px; text-align: center; font-size: 1.1rem; }
-        .grid-guard-valores { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px; }
-        .valor-destaque { background: #ffffff; border: 1px solid #bce8f1; padding: 6px; border-radius: 4px; font-size: 1.1rem; color: #0275d8; }
-
-        .secao-salvar-tpa { margin-top: 15px; padding-top: 15px; border-top: 2px dashed var(--border-color); }
-        .resumo-tpa-box { background-color: #e7f3ff; padding: 12px; border-radius: 8px; border: 1px solid #bce8f1; margin-bottom: 10px; }
-
-        .file-upload-container { border: 2px dashed var(--border-color); padding: 12px; border-radius: 8px; text-align: center; background: #fafbfc; cursor: pointer; position: relative; margin-top: 5px; }
-        .file-upload-container:hover { background: #f1f3f5; border-color: var(--primary); }
-        .file-upload-container input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
-        .preview-list { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
-        .preview-item { position: relative; background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 4px; width: 70px; text-align: center; }
-        .preview-item img { width: 60px; height: 60px; object-fit: cover; border-radius: 4px; }
-        .btn-remove-foto { background: var(--danger); color: white; border: none; font-size: 0.65rem; padding: 2px 4px; border-radius: 4px; cursor: pointer; width: 100%; margin-top: 2px; }
-
-        .grid-produto { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; align-items: center; margin-bottom: 10px; background: #f8f9fa; padding: 10px; border-radius: 8px; border: 1px solid #e9ecef; }
-        .grid-produto-guard { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 10px; align-items: center; margin-bottom: 10px; background: #f8f9fa; padding: 10px; border-radius: 8px; border: 1px solid #e9ecef; }
-        .prod-label { font-size: 0.95rem; font-weight: bold; color: #0275d8; display: flex; flex-direction: column; gap: 2px; }
-        .prod-desc { font-size: 0.75rem; color: #6c757d; font-weight: normal; line-height: 1.2; }
-        
-        @media (max-width: 500px) {
-            .grid-produto-header { display: none !important; }
-            .grid-produto { grid-template-columns: 1fr 1fr; }
-            .grid-produto .prod-label { grid-column: span 2; margin-bottom: 4px; border-bottom: 1px solid #ced4da; padding-bottom: 4px; }
-            
-            .grid-produto-guard { grid-template-columns: 1fr 1fr 1fr; }
-            .grid-produto-guard .prod-label { grid-column: span 3; margin-bottom: 4px; border-bottom: 1px solid #ced4da; padding-bottom: 4px; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AquaControl - Acesso Seguro</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0275d8">
+<link rel="apple-touch-icon" href="icone-512x512.png">
+<style>
+:root {
+--primary: #0275d8;
+--primary-hover: #0157a0;
+--success: #28a745;
+--success-hover: #218838;
+--danger: #d9534f;
+--danger-hover: #c9302c;
+--bg-color: #f0f4f8;
+--card-bg: #ffffff;
+--text-color: #333333;
+--border-color: #ced4da;
+}
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color:
+var(--bg-color); margin: 0; padding: 10px; color: var(--text-color); }
+.container { max-width: 650px; margin: 0 auto; }
+.card { background: var(--card-bg); padding: 15px; margin-bottom: 15px; border-radius:
+12px; border: 1px solid #bce8f1; box-shadow: 0 4px 8px rgba(2, 117, 216, 0.08); }
+.header-app { display: flex; justify-content: space-between; align-items: center;
+background: linear-gradient(135deg, #0275d8, #0157a0); color: white; padding: 15px 20px;
+border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(2, 117, 216, 0.3); }
+.header-app h1 { margin: 0; font-size: 1.4rem; }
+.badge-nuvem { background: rgba(255, 255, 255, 0.2); padding: 5px 10px; border-radius:
+20px; font-size: 0.8rem; font-weight: bold; display: flex; align-items: center; gap: 5px; }
+h2 {margin-top: 0; color: var(--primary); font-size: 1.1rem; border-bottom: 2px solid
+#e9ecef; padding-bottom: 8px; margin-bottom: 12px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+.grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px; margin-bottom:
+10px; }
+@media (max-width: 500px) {.grid-4 { grid-template-columns: 1fr 1fr; } }
+label { font-size: 0.8rem; font-weight: 700; display: block; margin-bottom: 4px; color:
+#495057; }
+input, select, textarea { width: 100%; padding: 8px; border: 1px solid var(--border-color);
+border-radius: 6px; box-sizing: border-box; font-size: 0.9rem; background-color: #fff; }
+input:focus, select:focus {outline: none; border-color: var(--primary); box-shadow: 0 0 0
+3px rgba(2, 117, 216, 0.15); }
+.input-readonly { background-color: #e9ecef !important; color: #495057; border: 1px solid
+#ced4da; text-align: center; font-size: 0.85rem; padding: 6px; }
+button { width: 100%; background-color: var(--primary); color: white; border: none;
+padding: 12px; font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 10px; font-size: 0.95rem; transition: background 0.2s; }
+button:hover { background-color: var(--primary-hover); }
+.btn-success { background-color: var(--success); }
+.btn-success:hover { background-color: var(--success-hover); }
+.btn-blue { background-color: #0275d8; }
+.btn-blue:hover { background-color: #0157a0; }
+.secao-app { display: none; }
+.menu-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 10px; }
+.btn-menu { background: #fff; color: var(--primary); border: 2px solid #bce8f1; padding:
+18px; border-radius: 10px; font-size: 1.1rem; font-weight: bold; cursor: pointer; text-align: left;
+display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px
+rgba(2, 117, 216, 0.05); transition: all 0.2s; margin-top: 0; }
+.btn-menu:hover { background: #e7f3ff; border-color: var(--primary); transform:
+translateY(-2px); }
+.btn-menu-icon { font-size: 1.3rem; color: #0275d8; }
+.btn-voltar { background-color: #6c757d; margin-bottom: 15px; margin-top: 0; display:
+flex; justify-content: center; align-items: center; gap: 8px; }
+.btn-voltar:hover { background-color: #5a6268; }
+.resultado { background: #e7f3ff; border: 1px solid #bce8f1; color: #0c5460; padding:
+12px; border-radius: 6px; font-weight: normal; margin-top: 12px; text-align: center; font-size:
+1rem; line-height: 1.4; }
+.info-tpa-inline {font-size: 0.85rem; color: #0275d8; font-weight: bold; display: flex; align-items: flex-end; padding-bottom: 4px; }
+.info-dosagem-guard { background: #e7f3ff; border: 1px solid #bce8f1; color: #0c5460;
+padding: 12px; border-radius: 6px; font-weight: bold; margin-top: 12px; margin-bottom: 10px;
+text-align: center; font-size: 1.1rem; }
+.grid-guard-valores { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top:
+6px; }
+.valor-destaque { background: #ffffff; border: 1px solid #bce8f1; padding: 6px; border-radius: 4px; font-size: 1.1rem; color: #0275d8; }
+.secao-salvar-tpa {margin-top: 15px; padding-top: 15px; border-top: 2px dashed var(--border-color); }
+.resumo-tpa-box { background-color: #e7f3ff; padding: 12px; border-radius: 8px; border:
+1px solid #bce8f1; margin-bottom: 10px; }
+.file-upload-container { border: 2px dashed var(--border-color); padding: 12px; border-radius: 8px; text-align: center; background: #fafbfc; cursor: pointer; position: relative; margin-top: 5px; }
+.file-upload-container:hover { background: #f1f3f5; border-color: var(--primary); }
+.file-upload-container input[type="file"] { position: absolute; top: 0; left: 0; width: 100%;
+height: 100%; opacity: 0; cursor: pointer; }
+.preview-list { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+.preview-item {position: relative; background: #fff; border: 1px solid #ddd; border-radius:
+6px; padding: 4px; width: 70px; text-align: center; }
+.preview-item img { width: 60px; height: 60px; object-fit: cover; border-radius: 4px; }
+.btn-remove-foto { background: var(--danger); color: white; border: none; font-size:
+0.65rem; padding: 2px 4px; border-radius: 4px; cursor: pointer; width: 100%; margin-top: 2px;
+}
+.grid-produto { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; align-items:
+center; margin-bottom: 10px; background: #f8f9fa; padding: 10px; border-radius: 8px; border:
+1px solid #e9ecef; }
+.grid-produto-guard { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 10px; align-items: center; margin-bottom: 10px; background: #f8f9fa; padding: 10px; border-radius: 8px;
+border: 1px solid #e9ecef; }
+.prod-label {font-size: 0.95rem; font-weight: bold; color: #0275d8; display: flex; flex-direction: column; gap: 2px; }
+.prod-desc {font-size: 0.75rem; color: #6c757d; font-weight: normal; line-height: 1.2; }
+@media (max-width: 500px) {
+.grid-produto-header { display: none !important; }
+.grid-produto {grid-template-columns: 1fr 1fr; }
+.grid-produto .prod-label {grid-column: span 2; margin-bottom: 4px; border-bottom:
+1px solid #ced4da; padding-bottom: 4px; }
+.grid-produto-guard {grid-template-columns: 1fr 1fr 1fr; }
+.grid-produto-guard .prod-label { grid-column: span 3; margin-bottom: 4px; border-bottom: 1px solid #ced4da; padding-bottom: 4px; }
+}
+.tela-login { max-width: 400px; margin: 50px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; border: 1px solid #bce8f1; }
+.loader { display: none; margin-top: 15px; font-size: 0.9rem; color: var(--primary); font-weight: bold; }
+</style>
 </head>
 <body>
-
 <div class="container" id="app-container">
-    <div class="tela-login" id="tela-login-ui">
-        <h1>🔒 AquaControl Acesso</h1>
-        <p style="font-size: 0.85rem; color: #666; margin-bottom: 20px;">Autenticação obrigatória para carregar os módulos térmicos.</p>
-        
-        <div>
-            <label>Seu Nome</label>
-            <input type="text" id="login_nome" placeholder="Ex: Anderson">
-        </div>
-        <div>
-            <label>Senha da Nuvem</label>
-            <input type="password" id="login_senha" placeholder="Digite a senha">
-        </div>
-        
-        <button id="btn-login" onclick="fazerLogin()"> INICIAR APLICATIVO</button>
-        <div class="loader" id="login-loader">⏳ Conectando aos servidores...<br>baixando módulos térmicos...</div>
-    </div>
+<div class="tela-login" id="tela-login-ui">
+<h1>🔒 AquaControl Acesso</h1>
+<p style="font-size: 0.85rem; color: #666; margin-bottom: 20px;">Autenticação
+obrigatória para carregar os módulos térmicos.</p>
+<div>
+<label>Seu Nome</label>
+<input type="text" id="login_nome" placeholder="Ex: Anderson">
 </div>
-
+<div>
+<label>Senha da Nuvem</label>
+<input type="password" id="login_senha" placeholder="Digite a senha">
+</div>
+<button id="btn-login" onclick="fazerLogin()"> INICIAR APLICATIVO</button>
+<div class="loader" id="login-loader">⏳ Conectando aos servidores...<br>baixando
+módulos térmicos...</div>
+</div>
+</div>
 <script>
-    // A SUA URL CORRETA DA NUVEM DO GOOGLE
-    const GOOGLE_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzBzvOtp4nlC9jsbBs_cPpoKTnzDLYAyVcfKGiDk0E3D4A_VOAssr0HYa5J_VhZNIAJyA/exec";
-
-    window.onload = () => {
-        if(localStorage.getItem('aqua_nome')) document.getElementById('login_nome').value = localStorage.getItem('aqua_nome');
-        if(localStorage.getItem('aqua_senha')) document.getElementById('login_senha').value = localStorage.getItem('aqua_senha');
-    };
-
-    async function fazerLogin() {
-        const nome = document.getElementById('login_nome').value.trim();
-        const senha = document.getElementById('login_senha').value.trim();
-        if (!nome || !senha) { alert("Preencha nome e senha!"); return; }
-
-        document.getElementById('btn-login').style.display = 'none';
-        document.getElementById('login-loader').style.display = 'block';
-
-        try {
-            const resposta = await fetch(GOOGLE_WEB_APP_URL, {
-                method: 'POST', body: JSON.stringify({ tipo: 'LOGIN', senha: senha })
-            });
-            const dados = await resposta.json();
-
-            if (dados.status === "success") {
-                localStorage.setItem('aqua_nome', nome);
-                localStorage.setItem('aqua_senha', senha);
-                document.getElementById('app-container').innerHTML = dados.html;
-                
-                // 1. Truque mágico: Força o navegador a traduzir &lt; e &gt; de volta para < e >
-                const tradutor = document.createElement('textarea');
-                tradutor.innerHTML = dados.js || "";
-                let jsReal = tradutor.value;
-
-                // 2. Limpeza de segurança (caso o Google mande tags <script> misturadas)
-                jsReal = jsReal.replace(/<script[^>]*>/gi, '').replace(/<\/script>/gi, '');
-
-                // 3. Executa a lógica agora que a matemática está perfeita
-                try {
-                    window.eval(jsReal);
-                    console.log("Lógica matemática injetada com sucesso!");
-                } catch (erroScript) {
-                    console.error("Erro na lógica:", erroScript);
-                    alert("Aviso: Falha ao carregar funções.");
-                }
-
-            } else {
-                alert("❌ " + dados.message);
-                document.getElementById('btn-login').style.display = 'block';
-                document.getElementById('login-loader').style.display = 'none';
-            }
-        } catch (erro) {
-            alert("❌ Erro de rede. É necessário internet para fazer o login inicial.");
-            document.getElementById('btn-login').style.display = 'block';
-            document.getElementById('login-loader').style.display = 'none';
-        }
-    }
-
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js').catch((erro) => console.log('Falha:', erro));
-    }
+// A SUA URL CORRETA DA NUVEM DO GOOGLE
+const GOOGLE_WEB_APP_URL =
+"https://script.google.com/macros/s/AKfycbzBzvOtp4nlC9jsbBs_cPpoKTnzDLYAyVcfKGiDk0E3D4A_VOAssr0HYa5J_VhZNIAJyA/exec";
+window.onload = () => {
+if(localStorage.getItem('aqua_nome')) document.getElementById('login_nome').value =
+localStorage.getItem('aqua_nome');
+if(localStorage.getItem('aqua_senha')) document.getElementById('login_senha').value =
+localStorage.getItem('aqua_senha');
+};
+async function fazerLogin() {
+const nome = document.getElementById('login_nome').value.trim();
+const senha = document.getElementById('login_senha').value.trim();
+if (!nome || !senha) { alert("Preencha nome e senha!"); return; }
+document.getElementById('btn-login').style.display = 'none';
+document.getElementById('login-loader').style.display = 'block';
+try {
+const resposta = await fetch(GOOGLE_WEB_APP_URL, {
+method: 'POST', body: JSON.stringify({ tipo: 'LOGIN', senha: senha })
+});
+const dados = await resposta.json();
+if (dados.status === "success") {
+localStorage.setItem('aqua_nome', nome);
+localStorage.setItem('aqua_senha', senha);
+document.getElementById('app-container').innerHTML = dados.html;
+// 1. Truque mágico: Força o navegador a traduzir &lt; e &gt; de volta para < e >
+const tradutor = document.createElement('textarea');
+tradutor.innerHTML = dados.js || "";
+let jsReal = tradutor.value;
+// 2. Limpeza de segurança
+jsReal = jsReal.replace(/<script[^>]*>/gi, '').replace(/<\/script>/gi, '');
+// 3. Executa a lógica
+try {
+window.eval(jsReal);
+console.log("Lógica matemática injetada com sucesso!");
+} catch (erroScript) {
+console.error("Erro na lógica:", erroScript);
+alert("Aviso: Falha ao carregar funções.");
+}
+} else {
+alert("❌ " + dados.message);
+document.getElementById('btn-login').style.display = 'block';
+document.getElementById('login-loader').style.display = 'none';
+}
+} catch (erro) {
+alert("❌ Erro de rede. É necessário internet para fazer o login inicial.");
+document.getElementById('btn-login').style.display = 'block';
+document.getElementById('login-loader').style.display = 'none';
+}
+}
+if ('serviceWorker' in navigator) {
+navigator.serviceWorker.register('sw.js').catch((erro) => console.log('Falha:', erro));
+}
 </script>
 </body>
 </html>
